@@ -1,0 +1,92 @@
+using System;
+using System.IO;
+
+class Program
+{
+    static void Main()
+    {
+        var filePath = @"C:\Georgian\Geogrian exept Architecture VM\Encoding\users.csv";
+        int count = 0;
+        int min = int.MaxValue;
+        int max = int.MinValue;
+        long sum = 0;
+
+        try
+        {
+            using (var reader = new StreamReader(filePath))
+            {
+                // Skip the first line (header)
+                reader.ReadLine();
+
+                while (!reader.EndOfStream)
+                {
+                    var line = reader.ReadLine();
+                    var values = line.Split(',');
+
+                    Console.WriteLine($"Last Name: {values[0]}, First Name: {values[1]}, Username: {values[2]}, Last Access: {values[3]}");
+
+                    // Parse the username to an integer and update min/max/sum if necessary
+                    if (int.TryParse(values[2], out int username))
+                    {
+                        if (username < min)
+                        {
+                            min = username;
+                        }
+                        if (username > max)
+                        {
+                            max = username;
+                        }
+                        sum += username;
+                    }
+
+                    count++;  // increment the counter
+                }
+            }
+
+            double average = sum / (double)count;
+
+            Console.WriteLine($"Total number of lines (users) processed: {count}");
+            Console.WriteLine($"Minimum Username: {min}");
+            Console.WriteLine($"Maximum Username: {max}");
+            Console.WriteLine($"Average Username: {average}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+
+        Console.Write("Enter a starting letter for Last Name: ");
+        string startLetter = Console.ReadLine();
+
+        Console.Write("Enter a sequence of three letters for First Name: ");
+        string threeLetters = Console.ReadLine();
+
+        try
+        {
+            using (var reader = new StreamReader(filePath))
+            {
+                // Skip the first line (header)
+                reader.ReadLine();
+
+                Console.WriteLine("Filtered users:");
+                while (!reader.EndOfStream)
+                {
+                    var line = reader.ReadLine();
+                    var values = line.Split(',');
+
+                    if (values[0].StartsWith(startLetter, StringComparison.OrdinalIgnoreCase)
+                        && values[1].Contains(threeLetters, StringComparison.OrdinalIgnoreCase))
+                    {
+                        Console.WriteLine($"Last Name: {values[0]}, First Name: {values[1]}, Username: {values[2]}, Last Access: {values[3]}");
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+
+        Console.ReadKey();
+    }
+}
